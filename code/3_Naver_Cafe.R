@@ -14,20 +14,23 @@ library(jsonlite)
 searchWord <- '노트북'
 
 # 오늘 날짜를 yyyymmdd 형태로 생성합니다.
-today <- Sys.Date() %>% format(format = '%Y%m%d')
+today <- format(x = Sys.Date(), format = '%Y%m%d')
 print(x = today)
 
 # POST 방식은 Query String 대신 Body를 설정합니다.
-# 이번 예제에서는 Body를 Payload(JSON 형태)로 전달해야 합니다.
-# 따라서 Body에 속한 항목을 리스트로 생성하고 toJSON() 함수로 변환합니다.
 body <- list(
   exceptMarketArticle = 1,
   page = 1,
   period = list(today, today),
   query = searchWord,
   sortBy = 0
-) %>% 
-  toJSON(auto_unbox = TRUE)
+)
+
+# 이번 예제에서는 Body를 Payload(JSON 형태)로 전달해야 합니다.
+# 따라서 Body에 속한 항목을 리스트로 생성하고 toJSON() 함수로 변환합니다.
+body %<>% toJSON(auto_unbox = TRUE)
+
+# body를 출력합니다.
 print(x = body)
 
 # HTTP 요청을 실행합니다.
@@ -57,10 +60,12 @@ print(x = totalCnt)
 df <- data$message$result$searchResultArticle$searchResult
 
 # df에서 필요한 컬럼만 선택합니다.
-df %<>% select(articleid, clubid, clubname, rawWriteDate, subject)
+df %<>% 
+  select(articleid, clubid, clubname, rawWriteDate, subject)
 
 # rawWriteDate 컬럼을 POSIX 자료형으로 변경합니다.
-df %<>% mutate(rawWriteDate = as.POSIXct(x = rawWriteDate, format = '%Y%m%d'))
+df %<>% 
+  mutate(rawWriteDate = as.POSIXct(x = rawWriteDate, format = '%Y%m%d'))
 
 # df의 구조를 파악합니다. 
 str(object = df)
@@ -195,10 +200,14 @@ cafe <- getCafeDfs(searchWord, bgnDate = today, endDate = today)
 # 검색어와 수집 기간을 정해 카페글 요약 데이터와 링크 수집
 # ----------------------------------------------------------------------------
 
-# 조회시작일자 및 조회종료일자를 Date 자료형으로 설정합니다.
+# 조회시작일자와 조회종료일자를 Date 자료형으로 설정합니다.
 # [참고] Date 자료형은 정수이므로 산술연산이 가능합니다.
-bgnDate <- as.Date(x = '2021-08-01')
-endDate <- as.Date(x = '2021-08-03')
+# bgnDate <- as.Date(x = '2021-01-01')
+# endDate <- as.Date(x = '2021-01-03')
+
+# 작업일 기준으로 조회시작일자와 조회종료일자를 설정합니다.
+bgnDate <- Sys.Date() - 2
+endDate <- Sys.Date()
 
 # 조회시작일자와 조회종료일자로 dates를 생성합니다.
 dates <- seq(from = bgnDate, to = endDate, by = '1 day')
@@ -263,10 +272,12 @@ for (i in 1:n) {
   str_glue('현재 {i}번째 카페글 본문 수집 중!') %>% print()
   
   # HTTP 요청을 실행합니다.
-  res <- GET(url = cafes$url[i], 
-             add_headers(
-               `referer` = 'https://cafe.naver.com/ca-fe/home/search/articles'
-             ))
+  res <- GET(
+    url = cafes$url[i], 
+    add_headers(
+      `referer` = 'https://cafe.naver.com/ca-fe/home/search/articles'
+    )
+  )
   
   # JSON 형태의 데이터를 선택합니다.
   data <- res %>% content(as = 'text') %>% fromJSON()

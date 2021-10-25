@@ -14,7 +14,7 @@ library(jsonlite)
 searchWord <- '노트북'
 
 # 오늘 날짜를 yyyy-mm-dd 형태로 생성합니다.
-today <- Sys.Date() %>% format(format = '%Y-%m-%d')
+today <- format(x = Sys.Date(), format = '%Y-%m-%d')
 print(x = today)
 
 # HTTP 요청을 실행합니다.
@@ -54,10 +54,12 @@ print(x = totalCnt)
 df <- data$result$searchList
 
 # df에서 필요한 컬럼만 선택합니다.
-df %<>% select(addDate, blogId, blogName, logNo, nickName, noTagTitle)
+df %<>% 
+  select(addDate, blogId, blogName, logNo, nickName, noTagTitle)
 
 # addDate 컬럼을 POSIX 자료형으로 변경합니다.
-df %<>% mutate(addDate = as.POSIXct(x = addDate / 1e3, origin = '1970-01-01'))
+df %<>% 
+  mutate(addDate = as.POSIXct(x = addDate / 1e3, origin = '1970-01-01'))
 
 # df의 구조를 파악합니다. 
 str(object = df)
@@ -192,12 +194,16 @@ blog <- getBlogDfs(searchWord, bgnDate = today, endDate = today)
 # 검색어와 수집 기간을 정해 블로그 요약 데이터와 링크 수집
 # ----------------------------------------------------------------------------
 
-# 조회시작일자 및 조회종료일자를 Date 자료형으로 설정합니다.
+# 조회시작일자와 조회종료일자를 Date 자료형으로 설정합니다.
 # [참고] Date 자료형은 정수이므로 산술연산이 가능합니다.
-bgnDate <- as.Date(x = '2021-08-01')
-endDate <- as.Date(x = '2021-08-03')
+# bgnDate <- as.Date(x = '2021-01-01')
+# endDate <- as.Date(x = '2021-01-03')
 
-# 조회시작일자와 조회종료일자로 dates를 생성합니다.
+# 작업일 기준으로 조회시작일자와 조회종료일자를 설정합니다.
+bgnDate <- Sys.Date() - 2
+endDate <- Sys.Date()
+
+# 조회시작일자와 조회종료일자의 일자별 간격인 dates를 생성합니다.
 dates <- seq(from = bgnDate, to = endDate, by = '1 day')
 print(x = dates)
 
