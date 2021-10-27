@@ -28,10 +28,10 @@ print(x = res)
 content(x = res, as = 'text')
 
 # 리뷰를 포함하는 HTML 요소를 선택하고, 텍스트만 추출합니다.
-res %>% 
+reviews <- res %>% 
   read_html() %>% 
   html_nodes(css = '#section_review > ul > li > div > div > p') %>% 
-  html_text() -> reviews
+  html_text()
 
 # reviews의 원소 개수를 확인합니다.
 length(x = reviews)
@@ -69,9 +69,9 @@ print(x = res)
 content(x = res, as = 'text')
 
 # JSON 데이터를 추출하여 리스트 객체를 생성합니다.
-res %>% 
+data <- res %>% 
   content(as = 'text') %>% 
-  fromJSON() -> data
+  fromJSON()
 
 # data의 클래스를 확인합니다.
 class(x = data)
