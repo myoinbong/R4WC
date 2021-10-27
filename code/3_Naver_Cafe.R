@@ -28,6 +28,7 @@ body <- list(
 
 # 이번 예제에서는 Body를 Payload(JSON 형태)로 전달해야 합니다.
 # 따라서 Body에 속한 항목을 리스트로 생성하고 toJSON() 함수로 변환합니다.
+# auto_unbox = TRUE를 생략하면 값(value)을 대괄호로 감싸게 됩니다.
 body %<>% toJSON(auto_unbox = TRUE)
 
 # body를 출력합니다.
